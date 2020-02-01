@@ -1,0 +1,10 @@
+src/
+node_modules/
+tsconfig.json
+.vs/
+.vscode/
+.editorconfig
+.idea
+.eslintignore
+.gitignore
+.eslintrc.js
