@@ -1,5 +1,5 @@
 {
-  "name": "ts-servant",
+  "name": "servant-ts",
   "version": "1.0.0",
   "description": "Haskell's Servant inspired library for defining API endpoints",
   "repository": "https://github.com/ivivona/servant-ts",
@@ -15,6 +15,9 @@
   "author": "Ignacio Vivona",
   "license": "MIT",
   "dependencies": {
+    "express": "^4.17.1",
+    "fp-ts": "^2.4.3",
+    "io-ts": "^2.0.6",
     "type-ts": "^1.0.2"
   },
   "peerDependencies": {
