@@ -63,7 +63,7 @@ app.use(
 
 ## Example
 
-SOON a [Real World](https://realworld.io/) backend.
+A [Real World](https://realworld.io/) [backend](https://github.com/ivivona/realworld-backend-servant-ts) using this library and Postgres SQL.
 
 ## Future work
 - [ ] Make it solid
