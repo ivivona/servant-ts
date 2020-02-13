@@ -8,6 +8,7 @@ import {
   ReqHeader,
   reqHeader,
   POST,
+  GET,
   HasCaptures,
   HasReqHeaders,
   HasQueryParams,
@@ -16,12 +17,12 @@ import {
   MimeDecoder,
   MimeEncoder,
   HasBody,
-  HasResponse,
   Json,
   HeaderValue,
   JsonC,
-  StatusCode
-} from "..";
+  StatusCode,
+  Response
+} from "../src/core";
 import { right, Either } from "fp-ts/lib/Either";
 
 declare const parseNumber: (_: any) => Either<never, number>;
@@ -54,6 +55,14 @@ reqHeader("nacho", parseNumber);
 reqHeader("nacho", parseNumbers);
 // $ExpectType ReqHeader<"nacho", number, number>
 reqHeader("nacho", justNumber);
+
+// $ExpectError
+GET`/api`.body(decodeJSON).response(encodeJSON).endpoint;
+// $ExpectError
+GET`/api`
+  .query("a")
+  .body(decodeJSON)
+  .response(encodeJSON).endpoint;
 
 // $ExpectError
 POST`/api/users/${capture("id")}/articles/${capture("id")}`;
@@ -100,7 +109,7 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;
 
 // $ExpectType HasReqHeaders<[ReqHeader<"Content-Type", HeaderValue, HeaderValue>,ReqHeader<"Authorization", HeaderValue, HeaderValue>]>
 POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
@@ -111,7 +120,7 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;
 
 // $ExpectType HasQueryParams<[QueryParam<"q", string>, QueryParam<"s", string>]>
 POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
@@ -122,7 +131,7 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;
 
 // $ExpectType HasResHeaders<[ResHeader<"Content-Type-2", HeaderValue, HeaderValue>,ResHeader<"Authorization-2", HeaderValue, HeaderValue>]>
 POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
@@ -133,7 +142,7 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;
 
 // $ExpectType HasBody<MimeDecoder<JsonC, string, any>>
 POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
@@ -144,9 +153,9 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;
 
-// $ExpectTypeHasResponse<MimeEncoder<JsonC, string>, StatusCode>
+// $ExpectType HasResponses<[Response<MimeEncoder<JsonC, string>, StatusCode>]>
 POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .reqHeader("Content-Type")
   .reqHeader("Authorization")
@@ -155,4 +164,4 @@ POST`/api/users/${capture("id")}/articles/${capture("articleId")}`
   .body(decodeJSON)
   .resHeader("Content-Type-2")
   .resHeader("Authorization-2")
-  .response(encodeJSON);
+  .response(encodeJSON).endpoint;

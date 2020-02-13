@@ -7,7 +7,6 @@ import {
   Capture,
   MimeEncoder,
   MimeType,
-  HasResponse,
   StatusCode,
   NotRepeating,
   HasURLPath,
@@ -31,9 +30,12 @@ import {
   FromURLFragment,
   queryParam,
   reqHeader,
-  resHeader
+  resHeader,
+  UniqueStatusCode,
+  AddResponse,
+  Response
 } from "./core";
-import { asJson as asJsonO, fromJson as fromJsonO } from "./codecs";
+import { asJson as asJsonO, fromJson as fromJsonO } from "./internal/codecs";
 import { Cast } from "type-ts";
 
 export function capture<F extends string>(identifier: F): Capture<F, string>;
@@ -68,21 +70,35 @@ class BuildResponse<E extends Partial<EndpointDefinition>>
   constructor(readonly endpoint: E) {}
 
   response<C extends MimeEncoder<any, any>>(
+    this: UniqueStatusCode<200, E> extends infer S
+      ? S extends StatusCode
+        ? BuildResponse<E>
+        : never
+      : never,
     encoder: C
-  ): E & HasResponse<C, 200>;
+  ): BuildResponse<AddResponse<UniqueStatusCode<200, E>, C, E>>;
   response<C extends MimeEncoder<any, any>, S extends StatusCode>(
     encoder: C,
-    status: S
-  ): E & HasResponse<C, S>;
-  response<C extends MimeEncoder<any, any>, S extends StatusCode>(
+    status: UniqueStatusCode<S, E>
+  ): BuildResponse<AddResponse<S, C, E>>;
+  response<C extends MimeEncoder<any, any>, S extends StatusCode = 200>(
     encoder: C,
-    status?: S
-  ): E & HasResponse<C, S> {
-    return {
-      ...this.endpoint,
-      resEncoder: encoder,
-      status: status ?? ((200 as any) as S)
-    };
+    status?: UniqueStatusCode<S, E>
+  ): BuildResponse<AddResponse<S, C, E>> {
+    const { responses, ...noResponses } = this.endpoint;
+    const newStatus = (status as StatusCode) ?? (200 as StatusCode);
+    if (responses?.find(_ => _.status === status)) {
+      throw new Error(`Response with status [${status}] already specified`);
+    }
+    const newResponses: Response<MimeEncoder<any, any>, StatusCode>[] = [
+      ...(responses ?? []),
+      new Response(encoder, newStatus)
+    ];
+    const newEndpoint = {
+      ...noResponses,
+      responses: newResponses
+    } as AddResponse<S, C, E>;
+    return new BuildResponse<AddResponse<S, C, E>>(newEndpoint);
   }
 }
 

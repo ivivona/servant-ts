@@ -4,7 +4,6 @@ import {
   HasURLPath,
   HasHTTPMethod,
   HttpMethod,
-  HasResponse,
   QueryParam,
   EndpointDefinition,
   ReqHeader,
@@ -13,7 +12,9 @@ import {
   ResponseWithHeaders,
   Capture,
   isResponseWithHeaders,
-  ResHeader
+  ResHeader,
+  Response,
+  HasResponses
 } from "./core";
 import { Tail } from "type-ts";
 import * as express from "express";
@@ -70,13 +71,18 @@ type WithCaptures<A> = A extends { captures: infer C }
 type ApiEndpoint = Partial<EndpointDefinition> &
   HasURLPath &
   HasHTTPMethod<HttpMethod> &
-  HasResponse<MimeEncoder<any, any>, StatusCode>;
+  HasResponses<[Response<MimeEncoder<any, any>, StatusCode>]>;
+
+type Responses<RS extends Response<MimeEncoder<any, any>, StatusCode>[]> = {
+  "0": never;
+  n: RS[0]["resEncoder"]["_I"] | Responses<Tail<RS>>;
+}[RS extends [] ? "0" : "n"];
 
 type HandlerResult<A extends ApiEndpoint> = A extends { resHeaders: infer HS }
   ? HS extends ResHeader<string, any, any>[]
-    ? ResponseWithHeaders<A["resEncoder"]["_I"], ResHeaderMap<A>>
-    : A["resEncoder"]["_I"]
-  : A["resEncoder"]["_I"];
+    ? ResponseWithHeaders<Responses<A["responses"]>, ResHeaderMap<A>>
+    : Responses<A["responses"]>
+  : Responses<A["responses"]>;
 
 type Handler<A extends ApiEndpoint> = (
   ctx: WithCaptures<A> &
@@ -129,6 +135,7 @@ export function addToRouter<A extends ApiEndpoint>(
           };
         }, {}),
         body: ((): void => {
+          // TODO: setup BODY PARSER here
           const value = api.bodyDecoder?.decoder(req.body);
           return value ? getOrThrow(value) : undefined;
         })()
