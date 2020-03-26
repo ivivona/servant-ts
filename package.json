@@ -18,6 +18,8 @@
     "express": "^4.17.1",
     "fp-ts": "^2.4.3",
     "io-ts": "^2.0.6",
+    "io-ts-types": "^0.5.6",
+    "runtypes": "^4.2.0",
     "type-ts": "^1.0.3"
   },
   "peerDependencies": {

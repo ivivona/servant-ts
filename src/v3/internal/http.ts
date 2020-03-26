@@ -12,16 +12,12 @@ export type HTTPMethod =
   | "PATCH";
 
 export class Verb<M extends HTTPMethod> {
+  readonly URI = "Verb";
   readonly _M!: M;
   constructor(readonly method: M) {}
 }
-export interface HasHTTPMethod<M extends HTTPMethod> {
-  readonly method: Verb<M>;
-}
 
 export class URLPath {
+  readonly URI = "URLPath";
   constructor(readonly path: string) {}
-}
-export interface HasURLPath {
-  readonly path: URLPath;
 }

@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Capture, UniqueCaptures, capture } from "./internal/capture";
 import { Equals, Concat, Push } from "type-ts";
-import { MimeEncoder, MimeDecoder } from "./internal/mimeType";
+import { Json } from "./internal/mimeType";
 import { URLPath, Verb } from "./internal/http";
 import { UniqueQueryParam } from "./internal/queryParam";
-import { right } from "fp-ts/es6/Either";
 import {
   Builder,
   WithResponse,
@@ -13,23 +12,32 @@ import {
   WithQuery,
   WithResHeader,
   WithBody
-} from "./internal/builderV3";
+} from "./internal/builder";
+import { RemoveAll } from "./internal/util";
+import * as t from "io-ts";
 
 function verbsWith<M extends unknown[]>(...modifiers: M) {
-  function GET<T extends Capture<string, unknown>[]>(
+  function GET<T extends Capture<string, any>[]>(
     fragments: TemplateStringsArray,
     ...captures: UniqueCaptures<T>
-  ): Builder<M, Concat<[URLPath, Verb<"GET">], T>> {
+  ): Builder<
+    RemoveAll<M, [{ body: unknown }]>,
+    Concat<[URLPath, Verb<"GET">], T>
+  > {
+    throw "unimplemented";
+  }
+  function POST<T extends Capture<string, any>[]>(
+    fragments: TemplateStringsArray,
+    ...captures: UniqueCaptures<T>
+  ): Builder<M, Concat<[URLPath, Verb<"POST">], T>> {
     throw "unimplemented";
   }
 
   return {
-    GET
+    GET,
+    POST
   };
 }
-
-const encodeJSON = (null as any) as MimeEncoder<any, any>;
-const decodeJSON = (null as any) as MimeDecoder<any, any>;
 
 class Auth {}
 const WithAuth = {
@@ -44,7 +52,8 @@ const WithAuth = {
     throw "unimplemented";
   }
 };
-const { GET } = verbsWith(
+
+const { GET, POST } = verbsWith(
   WithReqHeader,
   WithResHeader,
   WithAuth,
@@ -53,14 +62,14 @@ const { GET } = verbsWith(
   WithResponse,
   WithBody
 );
-const _api = GET`/api/${capture("aaa", right, "AAA CAPTURE")}/blah/${capture(
-  "bbb"
-)}`
-  .reqHeader("zzz", (_: any) => `${_}`)
-  // .auth()
-  .throw(encodeJSON, 402)
-  .query("aaa", right)
-  .query("aaa", right)
-  .body(decodeJSON)
-  .resHeader("aaa", (_: unknown) => "")
-  .response(encodeJSON, 200);
+const _api = POST`/api/${capture("aaa", t.Int)}/blah/${capture("bbb")}`
+  .reqHeader("zzz", t.boolean)
+  .reqHeader("zzz1", t.any)
+  .auth()
+  .throw(Json, t.type({ err: t.string }), 402)
+  .query("aaa", t.Int)
+  .query("aa", t.boolean)
+  .body(Json, t.string)
+  .resHeader("aaa", t.string)
+  .resHeader("aa", t.Int)
+  .response(Json, t.strict({ data: t.any }), 200);
