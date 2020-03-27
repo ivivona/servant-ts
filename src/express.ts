@@ -13,7 +13,7 @@ import {
   ResponseWithHeaders,
   Capture,
   isResponseWithHeaders,
-  ResHeader
+  ResHeader,
 } from "./core";
 import { Tail } from "type-ts";
 import * as express from "express";
@@ -94,7 +94,7 @@ export function addToRouter<A extends ApiEndpoint>(
   function getOrThrow<B>(either: Either<unknown, B>): B {
     return pipe(
       either,
-      fold(e => {
+      fold((e) => {
         throw e;
       }, identity)
     );
@@ -111,27 +111,27 @@ export function addToRouter<A extends ApiEndpoint>(
           const value = c.decoder(req.param(c.identifier));
           return {
             ...cs,
-            [c.identifier]: getOrThrow(value)
+            [c.identifier]: getOrThrow(value),
           };
         }, {}),
         headers: api.reqHeaders?.reduce((hs, h) => {
           const value = h.decoder(req.header(h.name));
           return {
             ...hs,
-            [h.name]: getOrThrow(value)
+            [h.name]: getOrThrow(value),
           };
         }, {}),
         query: api.queryParams?.reduce((qps, qp) => {
           const value = qp.decoder(req.query[qp.name]);
           return {
             ...qps,
-            [qp.name]: getOrThrow(value)
+            [qp.name]: getOrThrow(value),
           };
         }, {}),
         body: ((): void => {
           const value = api.bodyDecoder?.decoder(req.body);
           return value ? getOrThrow(value) : undefined;
-        })()
+        })(),
       } as any) as WithCaptures<A> &
         WithQueryParams<A> &
         WithHeaders<A> &
@@ -141,7 +141,7 @@ export function addToRouter<A extends ApiEndpoint>(
       res.status(api.status);
       res.setHeader("Content-Type", api.resEncoder.contentType.mimeType);
       if (isResponseWithHeaders(result)) {
-        api.resHeaders?.forEach(h => {
+        api.resHeaders?.forEach((h) => {
           const value = h.decoder(result.headers[h.name]);
           res.setHeader(h.name, getOrThrow(value));
         });

@@ -1,6 +1,6 @@
 {
   "name": "servant-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Haskell's Servant inspired library for defining API endpoints",
   "repository": "https://github.com/ivivona/servant-ts",
   "scripts": {
@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "fp-ts": "^2.4.3",
     "io-ts": "^2.0.6",
-    "type-ts": "^1.0.2"
+    "type-ts": "1.0.2"
   },
   "peerDependencies": {
     "express": "^4.x",
@@ -27,13 +27,13 @@
   },
   "devDependencies": {
     "@types/express": "^4.x",
-    "@typescript-eslint/eslint-plugin": "^2.18.0",
-    "@typescript-eslint/parser": "^2.18.0",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.1",
-    "typescript": "^3.7.5"
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.8.3"
   }
 }

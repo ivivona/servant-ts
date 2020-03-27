@@ -298,7 +298,7 @@ class BuildResponse<E extends Partial<EndpointDefinition>>
     return {
       ...this.endpoint,
       resEncoder: encoder,
-      status: status ?? ((200 as any) as S)
+      status: status ?? ((200 as any) as S),
     };
   }
 }
@@ -323,16 +323,16 @@ class BuildResHeader<
     encoder?: ToHeaderValue<V, O>
   ): BuildResHeader<AddResHeader<Cast<N, string>, V, O, E>> {
     const { resHeaders, ...noResHeaders } = this.endpoint;
-    if (resHeaders?.find(_ => _.name === name)) {
+    if (resHeaders?.find((_) => _.name === name)) {
       throw new Error(`Response header [${name}] already specified`);
     }
     const newResHeaders: ResHeader<string, any, any>[] = [
       ...(resHeaders ?? []),
-      encoder ? resHeader(name, encoder) : resHeader(name)
+      encoder ? resHeader(name, encoder) : resHeader(name),
     ];
     const newEndpoint = {
       ...noResHeaders,
-      resHeaders: newResHeaders
+      resHeaders: newResHeaders,
     } as AddResHeader<Cast<N, string>, V, O, E>;
     return new BuildResHeader<AddResHeader<Cast<N, string>, V, O, E>>(
       newEndpoint
@@ -352,7 +352,7 @@ class BuildBody<E extends Partial<EndpointDefinition>> extends BuildResHeader<
   ): BuildResHeader<E & HasBody<D>> {
     return new BuildResHeader<E & HasBody<D>>({
       ...this.endpoint,
-      bodyDecoder: mimeDecoder
+      bodyDecoder: mimeDecoder,
     });
   }
 }
@@ -378,16 +378,16 @@ class BuildQueryParam<E extends Partial<EndpointDefinition>> extends BuildBody<
   ): BuildQueryParam<AddQueryParam<P, E, O>> {
     // tslint:disable-next-line: no-shadowed-variable
     const { queryParams, ...noQueryParams } = this.endpoint;
-    if (queryParams?.find(_ => _.name === param)) {
+    if (queryParams?.find((_) => _.name === param)) {
       throw new Error(`Query parameter [${param}] already specified`);
     }
     const newQueryParams: QueryParam<string, any>[] = [
       ...(queryParams ?? []),
-      decoder ? queryParam(param, decoder) : queryParam(param)
+      decoder ? queryParam(param, decoder) : queryParam(param),
     ];
     const newEndpoint = {
       ...noQueryParams,
-      queryParams: newQueryParams
+      queryParams: newQueryParams,
     } as AddQueryParam<P, E, O>;
     return new BuildQueryParam<AddQueryParam<P, E, O>>(newEndpoint);
   }
@@ -413,16 +413,16 @@ class BuildReqHeader<
     decoder?: FromHeaderValue<V, O>
   ): BuildReqHeader<AddReqHeader<Cast<N, string>, V, O, E>> {
     const { reqHeaders, ...noReqHeaders } = this.endpoint;
-    if (reqHeaders?.find(_ => _.name === name)) {
+    if (reqHeaders?.find((_) => _.name === name)) {
       throw new Error(`Request header [${name}] already specified`);
     }
     const newReqHeaders: ReqHeader<string, any, any>[] = [
       ...(reqHeaders ?? []),
-      decoder ? reqHeader(name, decoder) : reqHeader(name)
+      decoder ? reqHeader(name, decoder) : reqHeader(name),
     ];
     const newEndpoint = {
       ...noReqHeaders,
-      reqHeaders: newReqHeaders
+      reqHeaders: newReqHeaders,
     } as AddReqHeader<Cast<N, string>, V, O, E>;
     return new BuildReqHeader<AddReqHeader<Cast<N, string>, V, O, E>>(
       newEndpoint
@@ -450,7 +450,7 @@ function build<T extends Capture<string, unknown>[], M extends HttpMethod>(
       return (f ?? "") + identifier;
     }).join(""),
     captures,
-    method
+    method,
   });
 }
 
